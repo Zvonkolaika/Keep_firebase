@@ -8,7 +8,7 @@ import { NoteListService } from '../../firebase-services/note-list.service'
   styleUrls: ['./note.component.scss']
 })
 export class NoteComponent {
-  @Input() note!:Note;
+  @Input() note!: Note;
   edit = false;
   hovered = false;
   
@@ -16,6 +16,7 @@ export class NoteComponent {
 
   changeMarkedStatus(){
     this.note.marked = !this.note.marked;
+    this.saveNote();
   }
 
   deleteHovered(){
@@ -34,19 +35,28 @@ export class NoteComponent {
   }
 
   moveToTrash(){
-    this.note.type = 'trash';
+    if(this.note.id){
+      this.note.type = 'trash';
+      let docID = this.note.id;
+      //delete this.note.id;
+      this.note.id = undefined;
+      this.noteService.addNote(this.note, "trash");
+      this.noteService.deleteNote("note", docID);
+    }
   }
 
   moveToNotes(){
-    this.note.type = 'note';
+    this.note.type = 'notes';
   }
 
   deleteNote(){
-
+    if(this.note.id){
+      this.noteService.deleteNote("trash", this.note.id);
+    }
   }
 
   saveNote(){
-    
+    this.noteService.updateNote(this.note);
   }
 
 }
